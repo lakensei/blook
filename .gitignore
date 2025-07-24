@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.idea
+
+# Virtual environments
+.venv
+/src/tools/pdf_parser/pdf2_split_handle.py
+/src/tools/pdf_parser/pdf_split_handle.py
+/src/infrastructure/llm/embedding/embedding_model.py
+/src/infrastructure/llm/embedding/rerank_model.py
+/tests/
+/log/
