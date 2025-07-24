@@ -28,9 +28,9 @@ def register_lifespan():
 def register_routers(app_: FastAPI) -> None:
     """注册路由"""
     from src.app_auth import auth_router
-    from src.app_mcp import mcp_router
+    from src.app_demo import demo_router
     app_.include_router(auth_router, tags=["Auth"])
-    app_.include_router(mcp_router, tags=["Mcp"])
+    app_.include_router(demo_router, tags=["Demo"])
 
     @app_.get("/health")
     async def health_check():
@@ -56,4 +56,4 @@ app = create_app()
 if __name__ == '__main__':
     import uvicorn
 
-    uvicorn.run(app,  port=9100)
+    uvicorn.run(app, log_config=None, port=9100)

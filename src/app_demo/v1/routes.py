@@ -3,14 +3,14 @@ import logging
 from fastapi import APIRouter, Depends, Path, Query
 
 from src.common.core.response import PaginatedRes
-from src.infrastructure.database import get_db_session
-from src.infrastructure.database.base import AsyncSession
+from src.common.core.database.repositories import Repository
+from src.infrastructure.database import get_repository
 from src.common.deps import get_current_user, CurrentUser
 from src.common.core.exceptions import ServiceException
-from ..schemas import McpItem, MCPServerMetadataRequest, MCPServerMetadataResponse
-from ..services import McpService
+from ..models import Mcp
+from ..schemas import McpItem, MCPServerMetadataRequest, MCPServerMetadataResponse, McpCreate
 from ..utils import load_mcp_tools
-
+from ...common.helpers.page_helper import paginate
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -19,14 +19,37 @@ router = APIRouter()
 async def mcp_list(
         page: int = Query(1, description="页码"),
         page_size: int = Query(10, description="一页大小"),
-        session: AsyncSession = Depends(get_db_session),
+        # session: AsyncSession = Depends(get_db_session),
+        repo: Repository[Mcp] = Depends(get_repository),
         user: CurrentUser = Depends(get_current_user)
     ):
         """
         mcp列表
         """
         creator = user.user_id
-        return await McpService.get_page_list(session, page, page_size)
+        crud = repo.get_crud(Mcp)
+        logger.debug(f"McpItem fields: {McpItem.model_fields}")
+        logger.debug(f"McpItem fields set: {McpItem.model_fields_set}")
+        res = await paginate(
+            crud,
+            page=page,
+            page_size=page_size,
+            fields=McpItem.model_fields.keys()
+        )
+        return res
+
+@router.post("/mcp", response_model=McpCreate)
+async def mcp_create(
+        item: McpCreate,
+        # session: AsyncSession = Depends(get_db_session)
+        repo: Repository[Mcp] = Depends(get_repository)
+    ):
+    """
+    创建MCP
+    """
+    crud = repo.get_crud(Mcp)
+    item = await crud.create(item.model_dump(exclude_unset=True))
+    return item
 
 @router.post("/server/metadata", response_model=MCPServerMetadataResponse)
 async def mcp_server_metadata(request: MCPServerMetadataRequest):

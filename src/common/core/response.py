@@ -2,12 +2,11 @@ from typing import TypeVar, List, Generic
 
 from pydantic import BaseModel
 
-Item = TypeVar("Item")
+T = TypeVar("T", bound=BaseModel)
 
-
-class PaginatedRes(BaseModel, Generic[Item]):
-    data: List[Item]
-    total: int
+class PaginatedRes(BaseModel, Generic[T]):
+    data: List[T] = []
+    total: int = 0
     page: int
     page_size: int
-    total_pages: int
+    total_pages: int = 0

@@ -3,7 +3,7 @@ from typing import Any, Dict, List, AsyncGenerator, Optional, TypeVar, Tuple, Un
 from typing import Generic
 
 T = TypeVar('T')
-
+IdType = Union[int, str, Dict[str, Any]]
 
 class Database(ABC):
     """数据库接口"""
@@ -32,7 +32,7 @@ class CRUD(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    async def get(self, id: Any) -> Optional[T]:
+    async def get(self, row_id: IdType) -> Optional[T]:
         pass
 
     @abstractmethod
@@ -40,11 +40,11 @@ class CRUD(ABC, Generic[T]):
         pass
 
     @abstractmethod
-    async def update(self, id: Any, data: Dict) -> Optional[T]:
+    async def update(self, row_id: IdType, data: Dict) -> Optional[T]:
         pass
 
     @abstractmethod
-    async def delete(self, id: Any) -> bool:
+    async def delete(self, row_id: IdType) -> bool:
         pass
 
     @abstractmethod
@@ -55,7 +55,7 @@ class CRUD(ABC, Generic[T]):
             limit: int = 100,
             order_by: List[Tuple[str, bool]] = None,
             fields: Set[str] = None  # 指定返回的字段
-    ) -> List[T]:
+    ) -> List[Dict]:
         """
         获取过滤后的结果
         :param filters: 过滤条件，如 {"status": "active", "age__gte": 18}

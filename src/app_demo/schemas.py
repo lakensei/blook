@@ -5,17 +5,30 @@ from pydantic import BaseModel, field_serializer, Field
 
 
 class McpItem(BaseModel):
-    """Represents a single MCP item."""
-    plan_id: str
-    chat_id: str
-    creator: str
-    status: int
-    title: str
-    create_time: datetime
+    mcp_id: str = Field(..., description="MCP唯一标识")
+    mcp_name: str = Field(..., description="MCP名称")
+    mcp_desc: str = Field(..., description="MCP描述信息")
+    mcp_type: Optional[str] = Field(None, description="MCP类型")
+    mcp_json: dict = Field(..., description="MCP的JSON配置内容")
+    creator: str = Field(..., description="创建人")
+    create_time: Optional[datetime] = Field(None, description="创建时间")
+    status: int = Field(0, description="状态（0=草稿，1=发布）")
+    updater: Optional[str] = Field(None, description="最后更新人")
+    update_time: Optional[datetime] = Field(None, description="最后更新时间")
 
-    @field_serializer("create_time")
-    def format_datetime(self, v: datetime) -> str:
+    @field_serializer("create_time", "update_time")
+    def format_datetime(self, v: Optional[datetime]) -> Optional[str]:
         return v.strftime("%Y-%m-%d %H:%M:%S") if v else None
+
+class McpCreate(BaseModel):
+    mcp_id: str = Field(..., description="MCP唯一标识")
+    mcp_name: str = Field(..., description="MCP名称")
+    mcp_desc: str = Field(..., description="MCP描述信息")
+    mcp_type: Optional[str] = Field(None, description="MCP类型")
+    mcp_json: dict = Field(..., description="MCP的JSON配置内容")
+    creator: str = Field(..., description="创建人")
+    status: int = Field(0, description="状态（0=草稿，1=发布）")
+    updater: Optional[str] = Field(None, description="最后更新人")
 
 
 class MCPServerMetadataRequest(BaseModel):
